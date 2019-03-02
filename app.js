@@ -7,6 +7,18 @@ const app = new Koa()
 const middleware = require('./src/middleware')
 require('koa-validate')(app)
 
+// const docs = require('koa-docs')
+// app.use(docs.get('/docs', {
+//    title: 'Pet Store API',
+//    version: '1.0.0',
+//    theme: 'paper',
+//    routeHandlers: 'disabled',
+//    groups: [
+//       { groupName: 'Pets', routes: [/*  ... route specs ...  */] },
+//       { groupName: 'Store', routes: [/*  ... route specs ...  */] }
+//    ]
+// }))
+
 
 // socket.io
 // const server = require('http').createServer(app.callback())
