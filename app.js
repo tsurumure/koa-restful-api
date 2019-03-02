@@ -1,30 +1,29 @@
+require("babel-register")
+
 const Koa = require('koa')
-const compress = require('koa-compress')
-const session = require('koa-session')
-const Router = require('koa-router')
-
-// 缓存
-const conditional = require('koa-conditional-get')
-const etag = require('koa-etag')
-
+const path = require('path')
 const app = new Koa()
-app.use(compress({ threshold: 0 }))
-app.use(conditional())
-app.use(etag())
 
-app.keys = ['secret']
-app.use(session({
-  key: 'koa:sess', maxAge: 1000 * 60 * 60 // 1小时
-  // maxAge: 3000
-}, app))
+const middleware = require('./src/middleware')
+require('koa-validate')(app)
 
 
-// .unless 不需要授权登录（header: Authorization）
-// 需要授权：['/api']，不需要授权：['/*', '/api/common', '/api/account/login']
-const jwtKoa = require('koa-jwt')
-app.use(jwtKoa({ secret: 'secret' }).unless({
-    path: [/^\/((?!api).)*$|api\/account\/login|api\/common\//]
-}))
+// socket.io
+// const server = require('http').createServer(app.callback())
+// const io = require('socket.io')(server)
+// io.on('connection', (socket) => {
+
+//     let user = '游客' + socket.id.substring(0, 6)
+//     io.local.emit('user conncet', user + '进入聊天室')
+
+//     socket.on('send', data => {
+//         console.log('客户端发送的内容：', data)
+//         socket.emit('getMsg', data)
+//         socket.broadcast.emit('getMsg', data)
+//     })
+
+// })
+// server.listen(3001)
 
 // Logs
 const { log, accessLogger } = require('./logs/config')
@@ -37,15 +36,55 @@ app.use(async (ctx, next) => {
   // log.info(`${ctx.method} ${ctx.url} - ${ms}ms`)
 })
 
-// Routers
-const router = new Router()
-router.get('/', async (ctx) => {
-    ctx.body = 'home'
-})
-app.use(router.routes())
-app.use(router.allowedMethods({
-    throw: true, // (Boolean) 抛出错误，而不是设置状态和头文件
-    notImplemented: function () {} // (function) 无提示错误的返回值
+app.use(middleware.bodyParser())
+app.use(middleware.serve( path.join(__dirname + '/static') ))
+app.use(middleware.compress({ threshold: 0 }))
+app.use(middleware.conditional())
+app.use(middleware.etag())
+app.use(middleware.handler)
+
+app.keys = ['secret']
+app.use(middleware.session({
+  key: 'koa:sess', maxAge: 1000 * 60 * 60 // 1小时
+  // maxAge: 3000
+}, app))
+
+
+// .unless 不需要授权登录（header: Authorization）
+// 需要授权：['/api']，不需要授权：['/*', '/api/common', '/api/account/login']
+const jwtKoa = require('koa-jwt')
+app.use(jwtKoa({ secret: 'secret' }).unless({
+    path: [/^\/((?!api).)*$|api\/account\/login|api\/common\//]
 }))
 
+// 遍历控制器 Controllers
+const Boom = require('boom') // https://github.com/hapijs/boom
+const ctls = require('./src/controllers')
+ctls.forEach(router => {
+    app.use(router.routes())
+    app.use(router.allowedMethods({
+        throw: true,
+        notImplemented: () => Boom.notImplemented(),
+        methodNotAllowed: () => Boom.methodNotAllowed()
+    }))
+})
+
+
+// 创建用户
+// const now = new Date()
+// const models = require(__dirname + '/app/sequelize/models')
+// models.Users.create({
+//   username: 'bbb', password: '123456',
+//   createdAt: now, updatedAt: now
+// })
+
 module.exports = app
+
+
+// 反向代理
+// var httpProxy = require('http-proxy')
+// httpProxy.createServer({
+//   target:''
+// }).listen(8081)
+
+
