@@ -1,0 +1,19 @@
+{
+  "name": "koa-restful-api",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "./node_modules/.bin/nodemon bin/www"
+  },
+  "dependencies": {
+    "koa": "^2.7.0",
+    "koa-bodyparser": "^4.2.1",
+    "koa-compress": "^3.0.0",
+    "koa-conditional-get": "^2.0.0",
+    "koa-etag": "^3.0.0",
+    "koa-jwt": "^3.5.1",
+    "koa-log4": "^2.3.2",
+    "koa-router": "^7.4.0",
+    "koa-session": "^5.10.1"
+  }
+}
