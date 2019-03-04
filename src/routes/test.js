@@ -1,5 +1,4 @@
 const router = require('koa-router')()
-
 router.prefix('/test')
 
 router.get('/', function (ctx, next) {

@@ -69,10 +69,10 @@ app.use(async (ctx, next) => {
 
 // .unless 不需要授权登录（header: Authorization）
 // 需要授权：['/api']，不需要授权：['/*', '/api/common', '/api/account/login']
-// const jwtKoa = require('koa-jwt')
-// app.use(jwtKoa({ secret: 'secret' }).unless({
-//     path: [/^\/((?!api).)*$|api\/account\/login|api\/common\//]
-// }))
+const jwtKoa = require('koa-jwt')
+app.use(jwtKoa({ secret: 'secret' }).unless({
+    path: [/^\/((?!api).)*$|\/api\/account\/login|\/api\/common/]
+}))
 
 
 // 路由
