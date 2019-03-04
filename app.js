@@ -100,8 +100,8 @@ routers.forEach(router => {
 
 // 创建用户
 // const now = new Date()
-// const models = require(__dirname + '/app/sequelize/models')
-// models.Users.create({
+// const models = require(__dirname + '/src/sequelize/models')
+// models.users.create({
 //   username: 'bbb', password: '123456',
 //   createdAt: now, updatedAt: now
 // })

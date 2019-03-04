@@ -14,7 +14,7 @@ module.exports = {
             comment: '用户唯一Id',
             type: Sequelize.STRING(11)
         },
-        name: {
+        username: {
             allowNull: false,
             unique: true,
             comment: '用户名',

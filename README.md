@@ -1,5 +1,7 @@
 # Koa-Restful-API
-koa2 + sequelize + jsdoc
+koa2 + sequelize
+文档 JsDoc
+单元测试 Mocha + Chai
 
 #### 环境 (Environment)
 * NodeJS `v10.13.0`
