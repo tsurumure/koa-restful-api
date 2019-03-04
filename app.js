@@ -4,21 +4,49 @@ const Koa = require('koa')
 const path = require('path')
 const app = new Koa()
 
-const middleware = require('./src/middleware')
+// Logs
+const { log, accessLogger } = require('./logs/config')
+app.use(accessLogger())
+app.use(async (ctx, next) => {
+  const start = new Date()
+  await next()
+  const ms = new Date() - start
+  // console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
+  // log.info(`${ctx.method} ${ctx.url} - ${ms}ms`)
+})
+
 require('koa-validate')(app)
 
-// const docs = require('koa-docs')
-// app.use(docs.get('/docs', {
-//    title: 'Pet Store API',
-//    version: '1.0.0',
-//    theme: 'paper',
-//    routeHandlers: 'disabled',
-//    groups: [
-//       { groupName: 'Pets', routes: [/*  ... route specs ...  */] },
-//       { groupName: 'Store', routes: [/*  ... route specs ...  */] }
-//    ]
-// }))
+const bodyParser = require('koa-bodyparser')
+const static = require('koa-static')
+const compress = require('koa-compress')
+app.use(bodyParser())
+app.use(static( path.join(__dirname + '/static') ))
+app.use(compress({ threshold: 0 }))
 
+// Cache
+const conditional = require('koa-conditional-get')
+const etag = require('koa-etag')
+app.use(conditional())
+app.use(etag())
+
+const session = require('koa-session')
+app.keys = ['secret']
+app.use(session({
+  key: 'koa:sess', maxAge: 1000 * 60 * 60 // 1小时
+  // maxAge: 3000
+}, app))
+
+app.use(async (ctx, next) => {
+  try {
+    await next();
+  } catch (err) {
+    ctx.response.status = err.statusCode || err.status || 500;
+    ctx.response.body = {
+      message: err.message
+    };
+  }
+})
 
 // socket.io
 // const server = require('http').createServer(app.callback())
@@ -37,42 +65,20 @@ require('koa-validate')(app)
 // })
 // server.listen(3001)
 
-// Logs
-const { log, accessLogger } = require('./logs/config')
-app.use(accessLogger())
-app.use(async (ctx, next) => {
-  const start = new Date()
-  await next()
-  const ms = new Date() - start
-  // console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
-  // log.info(`${ctx.method} ${ctx.url} - ${ms}ms`)
-})
-
-app.use(middleware.bodyParser())
-app.use(middleware.serve( path.join(__dirname + '/static') ))
-app.use(middleware.compress({ threshold: 0 }))
-app.use(middleware.conditional())
-app.use(middleware.etag())
-app.use(middleware.handler)
-
-app.keys = ['secret']
-app.use(middleware.session({
-  key: 'koa:sess', maxAge: 1000 * 60 * 60 // 1小时
-  // maxAge: 3000
-}, app))
 
 
 // .unless 不需要授权登录（header: Authorization）
 // 需要授权：['/api']，不需要授权：['/*', '/api/common', '/api/account/login']
-const jwtKoa = require('koa-jwt')
-app.use(jwtKoa({ secret: 'secret' }).unless({
-    path: [/^\/((?!api).)*$|api\/account\/login|api\/common\//]
-}))
+// const jwtKoa = require('koa-jwt')
+// app.use(jwtKoa({ secret: 'secret' }).unless({
+//     path: [/^\/((?!api).)*$|api\/account\/login|api\/common\//]
+// }))
 
-// 遍历控制器 Controllers
+
+// 路由
 const Boom = require('boom') // https://github.com/hapijs/boom
-const ctls = require('./src/controllers')
-ctls.forEach(router => {
+const routers = require('./src/router')
+routers.forEach(router => {
     app.use(router.routes())
     app.use(router.allowedMethods({
         throw: true,
@@ -82,6 +88,18 @@ ctls.forEach(router => {
 })
 
 
+
+// const docs = require('koa-docs')
+// app.use(docs.get('/docs', {
+//    title: 'Pet Store API',
+//    version: '1.0.0',
+//    theme: 'paper',
+//    routeHandlers: 'disabled',
+//    groups: [
+//       { groupName: 'Pets', routes: [/*  ... route specs ...  */] },
+//    ]
+// }))
+
 // 创建用户
 // const now = new Date()
 // const models = require(__dirname + '/app/sequelize/models')
@@ -90,13 +108,7 @@ ctls.forEach(router => {
 //   createdAt: now, updatedAt: now
 // })
 
+
+
+
 module.exports = app
-
-
-// 反向代理
-// var httpProxy = require('http-proxy')
-// httpProxy.createServer({
-//   target:''
-// }).listen(8081)
-
-

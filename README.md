@@ -1,5 +1,5 @@
-# Koa-CMS
-这是一套基于 [koa2](https://github.com/koajs/koa) + Vue + MySql 从零开始搭建的 CMS 后台管理系统
+# Koa-Restful-API
+koa2 +
 
 #### 环境 (Environment)
 * NodeJS `v10.13.0`
@@ -13,9 +13,8 @@
 4. 使用 Vue-Cli3 的脚手架搭建
 
 #### 中间件 (Middlewares)
-* `koa`, `koa-logjs`, `koa-bodyparser`, `koa-static`, `koa-compress`
+* `koa`, `koa-logjs`, `koa-bodyparser`, `koa-compress`
 * `koa-conditional-get`, `koa-etag`, `koa-session`, `koa-router`
-* `art-template`, `koa-art-template`
 * `sequelize`, `mysql2`
 * `koa-jwt`, `jsonwebtoken`, `svg-captcha`
 
