@@ -16,7 +16,8 @@ router.prefix('/api/common')
 * @returns {string} 返回当前的书本名称
 */
 router.get('/', function (ctx, next) {
-  ctx.body = 'Common index!'
+    // ctx.body = false
+  ctx.body = { status: 200, msg: 'Common index!' }
 })
 
 router.get('/a', function (ctx, next) {

@@ -18,10 +18,8 @@ app.use(async (ctx, next) => {
 require('koa-validate')(app)
 
 const bodyParser = require('koa-bodyparser')
-const static = require('koa-static')
 const compress = require('koa-compress')
 app.use(bodyParser())
-app.use(static( path.join(__dirname + '/static') ))
 app.use(compress({ threshold: 0 }))
 
 // Cache

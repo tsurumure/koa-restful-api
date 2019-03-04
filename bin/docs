@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
-var app = require('../app');
+var app = require('../docs');
 var debug = require('debug')('demo:server');
 var http = require('http');
 
-var port = 3000
+var port = 3001
 var server = http.createServer(app.callback());
 
 server.listen(port);

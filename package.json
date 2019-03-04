@@ -6,7 +6,8 @@
   "scripts": {
     "start": "./node_modules/.bin/nodemon bin/www",
     "doc": "jsdoc -c ./docs/conf.json",
-    "doc-server": "nodemon docs.js"
+    "doc-server": "./node_modules/.bin/nodemon bin/docs",
+    "mocha": "mocha src/routes --recursive"
   },
   "dependencies": {
     "blueimp-md5": "^2.10.0",
@@ -33,9 +34,9 @@
   },
   "devDependencies": {
     "babel-register": "^6.26.0",
+    "chai": "^4.2.0",
     "docdash": "^1.0.3",
     "eslint": "^5.12.0",
-    "minami": "^1.2.3",
     "mysql2": "^1.6.4",
     "taffydb": "^2.7.3"
   }
